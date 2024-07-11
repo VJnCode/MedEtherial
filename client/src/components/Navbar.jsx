@@ -1,32 +1,45 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import logo from '../assets/logo.jpg'; // Ensure this path is correct
+import { Link, useNavigate } from 'react-router-dom';
 
+const Navbar = ({ isLoggedIn, onLogout }) => {
+  const navigate = useNavigate();
 
-const Navbar = () => {
+  const handleLogout = () => {
+    // Implement logout logic (clear localStorage, reset state, etc.)
+    // For demo purposes, just navigate to login page
+    navigate('/login');
+    if (onLogout) {
+      onLogout(); // Notify parent component of logout
+    }
+  };
+
   return (
-    <nav className="sticky top-4 bg-gradient-to-br from-white to-gray-100 shadow-lg rounded-lg z-50 mb-8 py-3 px-4 mx-6">
-      <div className="container mx-auto flex justify-between items-center">
-        {/* Logo and Med-Eth on the left */}
-        <div className="flex items-center space-x-2">
-          <img src={logo} alt="Med-Eth Logo" className="h-10 w-10 object-cover" />
-          <span className="text-2xl font-bold text-gray-800">Med-Eth</span>
+    <nav className="bg-gray-200 shadow-md px-4 py-2 flex items-center justify-between">
+      <div className="flex items-center">
+        <div className="mr-6">
+          <img src="/path/to/logo.png" alt="Logo" className="h-8" />
         </div>
-        {/* Navigation Links centered */}
-        <div className="flex-grow flex justify-center space-x-6">
-          <div className="flex space-x-6">
-            <Link to="/" className="text-gray-800 transition-colors duration-200 hover:text-gray-600 hover:underline">Home</Link>
-            <Link to="/schedules" className="text-gray-800 transition-colors duration-200 hover:text-gray-600 hover:underline">Schedules</Link>
-            <Link to="/doctor-appointment" className="text-gray-800 transition-colors duration-200 hover:text-gray-600 hover:underline">Doctor Appointment</Link>
-          </div>
-        </div>
-        {/* Login Button on the right with different shades of white */}
-        <div>
-          <button className="text-gray-800 hover:text-gray-600 transition-colors duration-200 bg-white shadow-md py-2 px-4 rounded-lg border border-gray-300">Login</button>
+        <div className="space-x-6">
+          <Link to="/" className="text-gray-800 hover:text-gray-600 transition-colors duration-200">Home</Link>
+          <Link to="/schedules" className="text-gray-800 hover:text-gray-600 transition-colors duration-200">Schedules</Link>
+          <Link to="/doctor-appointment" className="text-gray-800 hover:text-gray-600 transition-colors duration-200">Doctor Appointment</Link>
         </div>
       </div>
+      {isLoggedIn ? (
+        <div className="flex items-center">
+          {/* Replace with your profile icon or avatar */}
+          <div className="w-8 h-8 bg-gray-400 rounded-full"></div>
+          <button onClick={handleLogout} className="ml-4 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md">
+            Logout
+          </button>
+        </div>
+      ) : (
+        <Link to="/login" className="ml-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md">
+          Login
+        </Link>
+      )}
     </nav>
   );
-};
+}
 
 export default Navbar;
