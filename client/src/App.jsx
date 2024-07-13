@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Navbar from './components/Navbar';
+import Navbar from './components/Navbar';   
 import Home from './pages/Home';
 import Schedules from './pages/Schedules';
 import DoctorAppointment from './pages/DoctorAppointment';
-import SignUp from './pages/Signup';
 import SignIn from './pages/Register';
 
 
@@ -21,11 +20,6 @@ const App = () => {
     localStorage.removeItem('refreshToken');
   };
 
-
-  const handleSignUp = () => {
-    setIsLoggedIn(false)
-  };
-
   return (
     <Router>
       <div>
@@ -36,7 +30,7 @@ const App = () => {
             <Route path="/schedules" element={<Schedules />} />
             <Route path="/doctor-appointment" element={<DoctorAppointment />} />
             <Route path="/login" element={<SignIn onLogin={handleLogin} />} />
-            <Route path="/signup" element={<SignUp onSignup={handleSignUp}/>} />
+           
           </Routes>
         </div>
       </div>
