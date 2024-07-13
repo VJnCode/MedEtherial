@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'
 
 const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
@@ -7,18 +8,36 @@ const Login = ({ onLogin }) => {
   const [isLoginMode, setIsLoginMode] = useState(true); // Track whether in login or signup mode
   const navigate = useNavigate(); // Get the navigate function for programmatic navigation
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Basic login logic (replace with your actual authentication logic)
-    if (username === 'admin' && password === 'password') {
-      // Store credentials in local storage
-      localStorage.setItem('username', username);
+
+    //console.log(username + password)
+
+    // Replace with your actual authentication logic using Axios or Fetch API
+    try {
+
+      const formData = {
+        username,
+        password
+      }
+
+      const response = await axios.post('http://localhost:8000/api/v1/users/login', formData);
+      console.log('Signin successful');
+      const data = await response.data;
+
+      // Handle successful login (e.g., store token in local storage)
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken); 
+
+      // Redirect to home page
+      navigate('/');
+
       // Update login state in parent component
       onLogin();
-      // Redirect to home page upon successful login
-      navigate('/');
-    } else {
-      alert('Invalid username or password.');
+
+    } catch (error) {
+      console.error('Login error:', error);
+      alert(error.message); // Display a user-friendly error message
     }
   };
 
