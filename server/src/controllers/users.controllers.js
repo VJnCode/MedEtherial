@@ -83,15 +83,15 @@ const loginUser = asyncHandler(async (req, res) => {
     // access and refresh token
     // send cookie
 
-    const {email, username, password} = req.body
+    const {username, password} = req.body
     console.log(req.body)
 
-    if(!username && !email){
-        throw new apiError(400, "Username or email is required")
+    if(!username){
+        throw new apiError(400, "Username is required")
     }
 
     const user = await User.findOne({
-        $or: [{username}, {email}]
+        $or: [{username}]
     })
 
     if(!user){
