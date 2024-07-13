@@ -17,7 +17,7 @@ const Navbar = ({ isLoggedIn, onLogout }) => {
     <nav className="bg-gray-200 shadow-md px-4 py-2 flex items-center justify-between">
       <div className="flex items-center">
         <div className="mr-6">
-          <img src="/assests/logo.jpg" alt="Logo" className="h-8" />
+          <img src="../assets/logo.jpg" alt="Logo" className="h-8" />
         </div>
         <div className="space-x-6">
           <Link to="/" className="text-gray-800 hover:text-gray-600 transition-colors duration-200">Home</Link>

@@ -7,6 +7,7 @@ import DoctorAppointment from './pages/DoctorAppointment';
 import SignUp from './pages/Signup';
 import SignIn from './pages/Register';
 
+
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
