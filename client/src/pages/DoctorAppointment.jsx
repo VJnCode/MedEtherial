@@ -10,7 +10,7 @@ const DoctorAppointment = () => {
       time: '10:00 AM',
       doctor: 'Dr. John Doe',
       specialty: 'Cardiology',
-      thumbnail: 'https://via.placeholder.com/150', // Replace with actual doctor's image URL
+      thumbnail: 'https://via.placeholder.com/150', 
     },
     {
       id: 2,
@@ -18,7 +18,7 @@ const DoctorAppointment = () => {
       time: '2:30 PM',
       doctor: 'Dr. Melisha Smith',
       specialty: 'Dermatology',
-      thumbnail: 'https://via.placeholder.com/150', // Replace with actual doctor's image URL
+      thumbnail: 'https://via.placeholder.com/150',
     },
     {
       id: 3,

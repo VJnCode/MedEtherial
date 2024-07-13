@@ -1,49 +1,41 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const HospitalConnection = () => {
-  const [hospital1, setHospital1] = useState('');
-  const [hospital2, setHospital2] = useState('');
-  const [guardian, setGuardian] = useState('');
+  const [hospitalId, setHospitalId] = useState('');
+  const [guardianId, setGuardianId] = useState('');
 
-  const handleConnect = () => {
-    // Implement connection logic here
-    console.log(`Connecting ${hospital1} with ${hospital2} and guardian ${guardian}`);
+  const sendRequest = async () => {
+    try {
+      const response = await axios.post('/api/connections/request', { hospitalId, guardianId });
+      console.log('Connection request sent:', response.data);
+    } catch (error) {
+      console.error('Error sending connection request:', error);
+    }
   };
 
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Connect Hospitals and Guardians</h2>
-      <div className="space-y-4">
-        <input
-          type="text"
-          placeholder="Hospital 1"
-          value={hospital1}
-          onChange={(e) => setHospital1(e.target.value)}
-          className="border p-2 w-full"
-        />
-        <input
-          type="text"
-          placeholder="Hospital 2"
-          value={hospital2}
-          onChange={(e) => setHospital2(e.target.value)}
-          className="border p-2 w-full"
-        />
-        <input
-          type="text"
-          placeholder="Guardian"
-          value={guardian}
-          onChange={(e) => setGuardian(e.target.value)}
-          className="border p-2 w-full"
-        />
-        <button
-          onClick={handleConnect}
-          className="bg-blue-600 text-white p-2 rounded"
-        >
-          Connect
-        </button>
-      </div>
+      <input
+        type="text"
+        placeholder="Hospital ID"
+        value={hospitalId}
+        onChange={(e) => setHospitalId(e.target.value)}
+        className="border p-2 w-full"
+      />
+      <input
+        type="text"
+        placeholder="Guardian ID"
+        value={guardianId}
+        onChange={(e) => setGuardianId(e.target.value)}
+        className="border p-2 w-full"
+      />
+      <button onClick={sendRequest} className="bg-blue-600 text-white p-2 rounded">
+        Send Request
+      </button>
     </div>
   );
-}
+};
 
 export default HospitalConnection;
