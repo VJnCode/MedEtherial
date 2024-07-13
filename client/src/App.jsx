@@ -4,8 +4,8 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Schedules from './pages/Schedules';
 import DoctorAppointment from './pages/DoctorAppointment';
-import SignIn from './pages/SignIn';
-import SignUp from './pages/SignUp';
+import SignUp from './pages/Signup';
+import SignIn from './pages/Register';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

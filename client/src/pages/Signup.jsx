@@ -5,6 +5,9 @@ import axios from 'axios';
 const Signup = ({ onSignup }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [userPhone, setuserphone] = useState('');
+  const [careTakerPhone, setcaretakerphone] = useState('');
   // Track whether in login or signup mode (optional)
   // const [isLoginMode, setIsLoginMode] = useState(true);
   const navigate = useNavigate(); // Get the navigate function for programmatic navigation
@@ -18,7 +21,10 @@ const Signup = ({ onSignup }) => {
     try {
       const formData = {
         username,
+        email,
         password,
+        userPhone,
+        careTakerPhone
       };
 
       const response = await axios.post(url, formData);
@@ -60,6 +66,18 @@ const Signup = ({ onSignup }) => {
             />
           </div>
           <div className="input-box relative mb-6">
+            <i className='bx bxs-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400'></i>
+            <input
+              type="text"
+              placeholder="email"
+              className="w-full h-full bg-transparent border-2 border-black rounded-full text-black px-10 py-4 text-lg focus:outline-none shadow-md"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="input-box relative mb-6">
+           <i className='bx bxs-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400'></i>
             <input
               type="password"
               placeholder="Password"
@@ -69,6 +87,28 @@ const Signup = ({ onSignup }) => {
               required
             />
             <i className='bx bxs-lock-alt absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400'></i>
+          </div>
+          <div className="input-box relative mb-6">
+            <i className='bx bxs-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400'></i>
+            <input
+              type="text"
+              placeholder= "user phone"
+              className="w-full h-full bg-transparent border-2 border-black rounded-full text-black px-10 py-4 text-lg focus:outline-none shadow-md"
+              value={userPhone}
+              onChange={(e) => setuserphone(e.target.value)}
+              required
+            />
+          </div>
+          <div className="input-box relative mb-6">
+            <i className='bx bxs-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400'></i>
+            <input
+              type="text"
+              placeholder="care taker phone"
+              className="w-full h-full bg-transparent border-2 border-black rounded-full text-black px-10 py-4 text-lg focus:outline-none shadow-md"
+              value={careTakerPhone}
+              onChange={(e) => setcaretakerphone(e.target.value)}
+              required
+            />
           </div>
           <button type="submit" className="btn w-full py-3 bg-black text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition duration-300">
             Sign Up
