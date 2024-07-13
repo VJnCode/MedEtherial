@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Navbar from './components/Navbar';   
+import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Schedules from './pages/Schedules';
 import DoctorAppointment from './pages/DoctorAppointment';
 import SignIn from './pages/Register';
-
+import HospitalConnection from './pages/HospitalConnection';  // Import HospitalConnection component
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -30,7 +30,7 @@ const App = () => {
             <Route path="/schedules" element={<Schedules />} />
             <Route path="/doctor-appointment" element={<DoctorAppointment />} />
             <Route path="/login" element={<SignIn onLogin={handleLogin} />} />
-           
+            <Route path="/hospital-connection" element={<HospitalConnection />} /> {/* Add new route */}
           </Routes>
         </div>
       </div>
