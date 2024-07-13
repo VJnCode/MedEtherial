@@ -21,6 +21,11 @@ const App = () => {
     localStorage.removeItem('refreshToken');
   };
 
+
+  const handleSignUp = () => {
+    setIsLoggedIn(false)
+  };
+
   return (
     <Router>
       <div>
@@ -31,7 +36,7 @@ const App = () => {
             <Route path="/schedules" element={<Schedules />} />
             <Route path="/doctor-appointment" element={<DoctorAppointment />} />
             <Route path="/login" element={<SignIn onLogin={handleLogin} />} />
-            <Route path="/signup" element={<SignUp />} />
+            <Route path="/signup" element={<SignUp onSignup={handleSignUp}/>} />
           </Routes>
         </div>
       </div>
