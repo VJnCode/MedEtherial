@@ -4,7 +4,8 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Schedules from './pages/Schedules';
 import DoctorAppointment from './pages/DoctorAppointment';
-import Login from './pages/Register';
+import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -14,8 +15,9 @@ const App = () => {
   };
 
   const handleLogout = () => {
-    // Clear local storage, reset state, etc.
     setIsLoggedIn(false);
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
   };
 
   return (
@@ -27,13 +29,13 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/schedules" element={<Schedules />} />
             <Route path="/doctor-appointment" element={<DoctorAppointment />} />
-            <Route path="/login" element={<Login onLogin={handleLogin} />} />
+            <Route path="/login" element={<SignIn onLogin={handleLogin} />} />
+            <Route path="/signup" element={<SignUp />} />
           </Routes>
         </div>
       </div>
     </Router>
   );
 };
-
 
 export default App;
