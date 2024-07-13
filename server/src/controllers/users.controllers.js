@@ -61,16 +61,31 @@ const registerUser = asyncHandler( async (req, res) => {
         userPhone
     })
 
-    const createdUser = await User.findById(user._id).select(
-        "-password -refreshToken"
-    )
+    const {accessToken, refreshToken} = await generateAccessAndRefreshTokens(user._id)
+
+    const createdUser = await User.findById(user._id).
+    select("-password -refreshToken")
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
 
     if(!createdUser) {
         throw new apiError(500, "Something went wrong while registering user")
     }
 
-    return res.status(201).json(
-        new apiResponse(200, createdUser, "User registered successfully")
+    return res.status(201)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+        new apiResponse(
+            200, 
+            {
+                user: createdUser, accessToken, refreshToken
+            },
+            "User logged In Successfully"
+        )
     )
 
 })
