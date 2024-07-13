@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-
+// Import axios
+import axios from 'axios';
 const DoctorAppointment = () => {
   // Dummy data for appointments (replace with actual data)
   const appointments = [
@@ -56,11 +57,31 @@ const DoctorAppointment = () => {
 
   // State to manage which specialty is currently selected
   const [selectedSpecialty, setSelectedSpecialty] = useState(null);
-
+  const [userEmail, setUserEmail] = useState("user@example.in")
   // Function to handle selecting a specialty
   const handleSelectSpecialty = (specialty) => {
     setSelectedSpecialty(specialty === selectedSpecialty ? null : specialty);
   };
+
+  const handleBooking = async (appointment) => {
+    try {
+        const res = await axios.post('http://localhost:8000/api/v1/users/doctor-appointment', {
+            email: userEmail,
+            appointmentID: appointment.id, // Adjust the appointment ID if needed
+            date: appointment.date,
+            doctor: appointment.doctor
+        });
+        
+        if (res.data.success) {
+            alert("Booked Successfully");
+        } else {
+            alert("Cannot be booked");
+        }
+    } catch (error) {
+        alert("Cannot Be Booked");
+    }
+}
+
 
   return (
     <div className="min-h-screen bg-cover bg-center" style={{ backgroundImage: 'url(https://i.pinimg.com/564x/09/22/ee/0922eed0b8cc4d35753d28c677c7eded.jpg)' }}>
@@ -129,14 +150,14 @@ const DoctorAppointment = () => {
                         <Link to={`/appointment/${appointment.id}`} className="text-black hover:text-blue-500">{appointment.date}</Link>
                       </h2>
                       <p className="text-gray-600">
-                        <Link to={`/appointment/${appointment.id}`} className="text-black hover:text-blue-500">{appointment.time}</Link>
+
                       </p>
                       <p className="text-gray-600">Doctor: {appointment.doctor}</p>
                     </div>
                     <div className="mt-4">
-                      <Link to={`/book-now/${appointment.id}`} className="w-full bg-red-500 text-white hover:bg-red-600 font-bold py-2 px-4 rounded">
+                      <div className="w-full bg-red-500 text-white hover:bg-red-600 font-bold py-2 px-4 rounded" onClick={handleBooking}>
                         Book Now
-                      </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
