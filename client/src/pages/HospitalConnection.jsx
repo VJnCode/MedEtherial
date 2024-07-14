@@ -104,57 +104,25 @@ const EmergencyRequest = () => {
   }, [isRequestAccepted]);
 
   return (
-    <div className="max-lg mx-auto p-8 bg-white rounded-lg shadow-md mt-10 pt-20">
-      <h2 className="text-2xl font-bold mb-4 text-center">Emergency Connection Request</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label htmlFor="hospitalId" className="block text-gray-700">Hospital ID</label>
-          <input
-            type="text"
-            id="hospitalId"
-            value={hospitalId}
-            onChange={(e) => setHospitalId(e.target.value)}
-            className="mt-2 w-full p-2 border rounded-md"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="guardianId" className="block text-gray-700">Guardian ID</label>
-          <input
-            type="text"
-            id="guardianId"
-            value={guardianId}
-            onChange={(e) => setGuardianId(e.target.value)}
-            className="mt-2 w-full p-2 border rounded-md"
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors duration-200"
-        >
-          Submit Request
-        </button>
-      </form>
-      {isRequestAccepted && (
-        <div className="mt-4 p-4 bg-green-100 border-t-4 border-green-500 text-green-900 rounded-md flex justify-center w-15">
-          <div className="w-1/2">
-            <p className="font-bold">Request Accepted!</p>
-            <p>Hospital and Guardian are now connected and can track each other’s location.</p>
-            {hospitalLocation && guardianLocation && (
-              <MapContainer center={hospitalLocation} zoom={13} className="w-full h-96 mt-4">
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                />
-                <Marker position={hospitalLocation} />
-                <Marker position={guardianLocation} />
-                <Polyline positions={[hospitalLocation, guardianLocation]} color="blue" />
-              </MapContainer>
-            )}
-          </div>
-        </div>
-      )}
+    <div className="container mx-auto p-4 pt-20">
+      <h2 className="text-2xl font-bold mb-4">Connect Hospitals and Guardians</h2>
+      <input
+        type="text"
+        placeholder="Hospital ID"
+        value={hospitalId}
+        onChange={(e) => setHospitalId(e.target.value)}
+        className="border p-2 w-full"
+      />
+      <input
+        type="text"
+        placeholder="Guardian ID"
+        value={guardianId}
+        onChange={(e) => setGuardianId(e.target.value)}
+        className="border p-2 w-full"
+      />
+      <button onClick={sendRequest} className="bg-blue-600 text-white p-2 rounded">
+        Send Request
+      </button>
     </div>
   );
 } 

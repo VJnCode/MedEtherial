@@ -5,8 +5,7 @@ const Navbar = ({ isLoggedIn, onLogout }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Implement logout logic (clear localStorage, reset state, etc.)
-    // For demo purposes, just navigate to login page
+ 
     navigate('/login');
     if (onLogout) {
       onLogout(); 
@@ -14,7 +13,7 @@ const Navbar = ({ isLoggedIn, onLogout }) => {
   };
 
   return (
-    <nav className="fixed top-0 w-full bg-black shadow-md px-4 py-6 flex items-center justify-between z-50">
+    <nav className="fixed top-0 w-full bg-black shadow-md px-4 py-6 flex items-center justify-between z-50 h-20"> {/* Added a fixed height */}
       <div className="flex items-center">
         <div className="mr-6">
           <h1 className='text-white font-bold text-2xl'>Med-Ethereal</h1>
