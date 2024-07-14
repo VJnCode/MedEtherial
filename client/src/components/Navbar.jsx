@@ -14,18 +14,20 @@ const Navbar = ({ isLoggedIn, onLogout }) => {
   };
 
   return (
-    <nav className="bg-black shadow-md px-4 py-6 flex items-center justify-between">
+    <nav className="fixed top-0 w-full bg-black shadow-md px-4 py-6 flex items-center justify-between z-50">
       <div className="flex items-center">
         <div className="mr-6">
           <h1 className='text-white font-bold text-2xl'>Med-Ethereal</h1>
         </div>
       </div>
       <div className="flex flex-1 justify-center">
-        <div className="flex space-x-6">
-          <Link to="/" className="text-white text-xl hover:text-blue-400 transition-colors duration-200">Home</Link>
-          <Link to="/schedules" className="text-white  text-xl hover:text-blue-400 transition-colors duration-200">Schedules</Link>
-          <Link to="/doctor-appointment" className="text-white  text-xl hover:text-blue-400 transition-colors duration-200">Doctor Appointment</Link>
-          <Link to="/hospital-connection" className="text-white  text-xl hover:text-blue-400 transition-colors duration-200">Hospital Connection</Link>
+
+        <div className="flex">
+          <Link to="/" className="text-white text-xl hover:text-gray-300 hover:text-2xl transition-all duration-200 border-r border-gray-500 px-4">Home</Link>
+          <Link to="/schedules" className="text-white text-xl hover:text-gray-300 hover:text-2xl transition-all duration-200 border-r border-gray-500 px-4">Schedules</Link>
+          <Link to="/doctor-appointment" className="text-white text-xl hover:text-gray-300 hover:text-2xl transition-all duration-200 border-r border-gray-500 px-4">Doctor Appointment</Link>
+          <Link to="/hospital-connection" className="text-white text-xl hover:text-gray-300 hover:text-2xl transition-all duration-200 px-4">Hospital Connection</Link>
+
         </div>
       </div>
       <div>
