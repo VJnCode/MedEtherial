@@ -22,10 +22,10 @@ const Navbar = ({ isLoggedIn, onLogout }) => {
       </div>
       <div className="flex flex-1 justify-center">
         <div className="flex space-x-6">
-          <Link to="/" className="text-white text-xl hover:text-red-600 transition-colors duration-200">Home</Link>
-          <Link to="/schedules" className="text-white  text-xl hover:text-red-600 transition-colors duration-200">Schedules</Link>
-          <Link to="/doctor-appointment" className="text-white  text-xl hover:text-red-600 transition-colors duration-200">Doctor Appointment</Link>
-          <Link to="/hospital-connection" className="text-white  text-xl hover:text-red-600 transition-colors duration-200">Hospital Connection</Link>
+          <Link to="/" className="text-white text-xl hover:text-blue-400 transition-colors duration-200">Home</Link>
+          <Link to="/schedules" className="text-white  text-xl hover:text-blue-400 transition-colors duration-200">Schedules</Link>
+          <Link to="/doctor-appointment" className="text-white  text-xl hover:text-blue-400 transition-colors duration-200">Doctor Appointment</Link>
+          <Link to="/hospital-connection" className="text-white  text-xl hover:text-blue-400 transition-colors duration-200">Hospital Connection</Link>
         </div>
       </div>
       <div>
