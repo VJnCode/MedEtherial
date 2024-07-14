@@ -5,7 +5,7 @@ import Home from './pages/Home';
 import Schedules from './pages/Schedules';
 import DoctorAppointment from './pages/DoctorAppointment';
 import SignIn from './pages/Register';
-import HospitalConnection from './pages/HospitalConnection';  // Import HospitalConnection component
+import HospitalConnection from './pages/HospitalConnection';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
