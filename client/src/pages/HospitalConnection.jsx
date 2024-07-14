@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import 'leaflet-routing-machine';
+import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 
 // Fix marker icon issue with Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -10,6 +12,26 @@ L.Icon.Default.mergeOptions({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
+
+const RoutingMachine = ({ start, end }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map) return;
+
+    const routingControl = L.Routing.control({
+      waypoints: [L.latLng(start[0], start[1]), L.latLng(end[0], end[1])],
+      lineOptions: {
+        styles: [{ color: '#0078FF', opacity: 0.7, weight: 5 }],
+      },
+      createMarker: () => null,
+    }).addTo(map);
+
+    return () => map.removeControl(routingControl);
+  }, [map, start, end]);
+
+  return null;
+};
 
 const EmergencyRequest = () => {
   const [hospitalId, setHospitalId] = useState('');
@@ -25,7 +47,7 @@ const EmergencyRequest = () => {
     setTimeout(() => {
       setIsRequestAccepted(true);
       // Simulate nearest hospital location to Mysore
-      setHospitalLocation([12.2958, 76.6394]); // Example coordinates of Mysore
+      setHospitalLocation([12.349993444999527, 76.62840565194647]); // Example coordinates of Mysore
     }, 1000);
   };
 
@@ -96,14 +118,14 @@ const EmergencyRequest = () => {
             <p className="font-bold">Request Accepted!</p>
             <p>Hospital and Guardian are now connected and can track each other’s location.</p>
             {hospitalLocation && guardianLocation && (
-              <MapContainer center={hospitalLocation} zoom={13} className="w-full h-96 mt-4">
+              <MapContainer center={guardianLocation} zoom={13} className="w-full h-96 mt-4">
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
                 <Marker position={hospitalLocation} />
                 <Marker position={guardianLocation} />
-                <Polyline positions={[hospitalLocation, guardianLocation]} color="blue" />
+                <RoutingMachine start={guardianLocation} end={hospitalLocation} />
               </MapContainer>
             )}
           </div>
@@ -113,4 +135,4 @@ const EmergencyRequest = () => {
   );
 };
 
-export default EmergencyRequest;
+export default EmergencyRequest;      
