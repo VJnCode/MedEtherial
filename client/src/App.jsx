@@ -24,7 +24,7 @@ const App = () => {
     <Router>
       <div>
         <Navbar isLoggedIn={isLoggedIn} onLogout={handleLogout} />
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto max-w-full h-screen">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/schedules" element={<Schedules />} />
