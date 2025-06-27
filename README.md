@@ -91,38 +91,41 @@ Once both the backend and frontend servers are running, you can access MedEtheri
 
 A big thank you to the team members who contributed to this project\!
 ---
+## 👨‍💻 Contributors
+
 <table>
   <tr>
     <td align="center">
-       <a href="https://github.com/varunrajj">
+      <a href="https://github.com/varunrajj">
         <img src="https://avatars.githubusercontent.com/u/155479643?v=4" width="100px;" alt="Varun Raj" /><br />
         <sub><b>Varun Raj</b></sub>
+      </a>
+      <br /><a href="https://github.com/varunrajj">@varunrajj</a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/VJnCode">
+        <img src="https://avatars.githubusercontent.com/u/117127969?v=4" width="100px;" alt="Vaibhav" /><br />
+        <sub><b>Vaibhav</b></sub>
       </a>
       <br /><a href="https://github.com/VJnCode">@VJnCode</a>
     </td>
     <td align="center">
-      <a href="https://github.com/navaneetharya">
-        <img src="https://avatars.githubusercontent.com/u/155203651?v=4" width="100px;" alt="Navaneeth Arya" /><br />
-        <sub><b>Navaneeth Arya</b></sub>
+      <a href="https://github.com/kcharanya20">
+        <img src="https://avatars.githubusercontent.com/u/164454541?v=4" width="100px;" alt="Charanya K Naik" /><br />
+        <sub><b>Charanya K Naik</b></sub>
       </a>
-      <br /><a href="https://github.com/navaneetharya">@navaneetharya</a>
+      <br /><a href="https://github.com/kcharanya20">@kcharanya20</a>
     </td>
     <td align="center">
-      <a href="https://github.com/sankethkkottary">
-        <img src="https://avatars.githubusercontent.com/u/161363684?v=4" width="100px;" alt="Sanketh K Kottary" /><br />
-        <sub><b>Sanketh K Kottary</b></sub>
+      <a href="https://github.com/Melisha2904">
+        <img src="https://avatars.githubusercontent.com/u/164454401?v=4" width="100px;" alt="Melisha" /><br />
+        <sub><b>Melisha</b></sub>
       </a>
-      <br /><a href="https://github.com/sankethkkottary">@sankethkkottary</a>
-    </td>
-    <td align="center">
-       <a href="https://github.com/VJnCode">
-        <img src="https://avatars.githubusercontent.com/u/117127969?v=4" width="100px;" alt="Vaibhav M" /><br />
-        <sub><b>Vaibhav M</b></sub>
-      </a>
-      <br /><a href="https://github.com/varunrajj">@varunrajj</a>
+      <br /><a href="https://github.com/Melisha2904">@Melisha2904</a>
     </td>
   </tr>
 </table>
+
 -----
 
 ## 📄 License
