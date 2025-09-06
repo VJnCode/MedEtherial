@@ -1,4 +1,3 @@
-You got it\! Here's the complete content for your `README.md` file. You can simply copy and paste this into a new file named `README.md` in the root of your project, or use it to generate the file through another tool.
 
 ````markdown
 # 💊 MedEtherial
