@@ -1,0 +1,79 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# Deploys: Keycloak (OIDC), its Postgres database, and the MedEtherial API.
+# Secrets marked `sync: false` are entered once in the Render dashboard.
+
+databases:
+  - name: medetherial-keycloak-db
+    databaseName: keycloak
+    user: keycloak
+    plan: free
+
+services:
+  - type: web
+    name: medetherial-keycloak
+    runtime: docker
+    rootDir: infra/keycloak
+    dockerfilePath: ./Dockerfile
+    plan: starter # Keycloak needs ~512MB+ RAM; free instances are too small
+    healthCheckPath: /realms/medetherial/.well-known/openid-configuration
+    autoDeploy: false # deployed by GitHub Actions after CI passes
+    envVars:
+      - key: KC_DB_URL
+        sync: false # jdbc:postgresql://<host>:5432/keycloak  (from the database's internal URL)
+      - key: KC_DB_USERNAME
+        fromDatabase: { name: medetherial-keycloak-db, property: user }
+      - key: KC_DB_PASSWORD
+        fromDatabase: { name: medetherial-keycloak-db, property: password }
+      - key: KC_HOSTNAME
+        sync: false # e.g. https://medetherial-keycloak.onrender.com
+      - key: KC_BOOTSTRAP_ADMIN_USERNAME
+        value: admin
+      - key: KC_BOOTSTRAP_ADMIN_PASSWORD
+        generateValue: true
+      - key: WEB_URL
+        sync: false # e.g. https://medetherial.vercel.app
+      - key: KC_WEB_CLIENT_SECRET
+        generateValue: true
+      - key: KC_ADMIN_CLIENT_SECRET
+        generateValue: true
+      - key: DEMO_USER_PASSWORD
+        generateValue: true
+      - key: PORT
+        value: 8080
+
+  - type: web
+    name: medetherial-api
+    runtime: docker
+    dockerfilePath: ./apps/api/Dockerfile
+    dockerContext: .
+    plan: starter
+    region: singapore
+    healthCheckPath: /readyz
+    autoDeploy: false
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 8000
+      - key: MONGODB_URI
+        sync: false
+      - key: OIDC_ISSUER
+        sync: false # https://medetherial-keycloak.onrender.com/realms/medetherial
+      - key: OIDC_AUDIENCE
+        value: medetherial-api
+      - key: KEYCLOAK_ADMIN_CLIENT_ID
+        value: medetherial-api-admin
+      - key: KEYCLOAK_ADMIN_CLIENT_SECRET
+        sync: false # same value as KC_ADMIN_CLIENT_SECRET on the Keycloak service
+      - key: CORS_ORIGINS
+        sync: false # https://medetherial.vercel.app
+      - key: OSRM_URL
+        value: https://router.project-osrm.org
+      - key: CLINIC_TIMEZONE
+        value: Asia/Kolkata
+      - key: SIMULATOR_ENABLED
+        value: 'true'
+      - key: SIMULATOR_AUTO_INCIDENTS
+        value: 'false'
+      - key: LOG_LEVEL
+        value: info

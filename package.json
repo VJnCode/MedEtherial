@@ -1,0 +1,20 @@
+{
+  "name": "medetherial",
+  "private": true,
+  "packageManager": "pnpm@12.21.0",
+  "engines": { "node": ">=20.11" },
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "seed": "pnpm --filter @medetherial/api seed",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md,yml}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
+  }
+}

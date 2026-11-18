@@ -1,0 +1,380 @@
+{
+  "realm": "medetherial",
+  "enabled": true,
+  "displayName": "MedEtherial",
+  "displayNameHtml": "<b>Med</b>Etherial",
+  "sslRequired": "external",
+  "registrationAllowed": true,
+  "registrationEmailAsUsername": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "rememberMe": true,
+  "verifyEmail": false,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "failureFactor": 10,
+  "permanentLockout": false,
+  "maxFailureWaitSeconds": 900,
+  "passwordPolicy": "length(8) and digits(1) and upperCase(1) and lowerCase(1) and notUsername",
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "offlineSessionIdleTimeout": 2592000,
+  "loginTheme": "keycloak.v2",
+  "accountTheme": "keycloak.v3",
+  "eventsEnabled": true,
+  "eventsExpiration": 2592000,
+  "adminEventsEnabled": true,
+  "adminEventsDetailsEnabled": false,
+  "enabledEventTypes": [
+    "LOGIN",
+    "LOGIN_ERROR",
+    "LOGOUT",
+    "REGISTER",
+    "UPDATE_PASSWORD",
+    "CODE_TO_TOKEN_ERROR"
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "uma_authorization",
+        "description": "${role_uma_authorization}"
+      },
+      {
+        "name": "offline_access",
+        "description": "${role_offline-access}"
+      },
+      {
+        "name": "patient",
+        "description": "Patient \u2014 books appointments, views own records, raises SOS"
+      },
+      {
+        "name": "doctor",
+        "description": "Doctor \u2014 manages schedule, writes notes and prescriptions"
+      },
+      {
+        "name": "paramedic",
+        "description": "Paramedic \u2014 ambulance crew, publishes GPS, updates incidents"
+      },
+      {
+        "name": "dispatcher",
+        "description": "Dispatcher \u2014 monitors fleet, assigns incidents"
+      },
+      {
+        "name": "hospital_admin",
+        "description": "Hospital administrator \u2014 manages ER capacity"
+      },
+      {
+        "name": "admin",
+        "description": "Platform administrator"
+      },
+      {
+        "name": "default-roles-medetherial",
+        "description": "Default roles for new users",
+        "composite": true,
+        "composites": {
+          "realm": [
+            "offline_access",
+            "uma_authorization",
+            "patient"
+          ]
+        }
+      }
+    ]
+  },
+  "defaultRole": {
+    "name": "default-roles-medetherial",
+    "description": "Default roles for new users",
+    "composite": true
+  },
+  "clients": [
+    {
+      "clientId": "medetherial-web",
+      "name": "MedEtherial Web",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${KC_WEB_CLIENT_SECRET:dev-web-client-secret}",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "${WEB_URL:http://localhost:3000}/*",
+        "http://localhost:3000/*"
+      ],
+      "webOrigins": [
+        "${WEB_URL:http://localhost:3000}",
+        "http://localhost:3000"
+      ],
+      "rootUrl": "${WEB_URL:http://localhost:3000}",
+      "baseUrl": "/",
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "${WEB_URL:http://localhost:3000}/*##http://localhost:3000/*",
+        "frontchannel.logout": "false",
+        "backchannel.logout.session.required": "true"
+      },
+      "protocolMappers": [
+        {
+          "name": "api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.custom.audience": "medetherial-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "medetherial-api",
+      "name": "MedEtherial API (resource server)",
+      "enabled": true,
+      "bearerOnly": true,
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false
+    },
+    {
+      "clientId": "medetherial-api-admin",
+      "name": "MedEtherial API admin service account",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${KC_ADMIN_CLIENT_SECRET:dev-admin-client-secret}",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true
+    }
+  ],
+  "users": [
+    {
+      "id": "a0000000-0000-4000-8000-000000000001",
+      "username": "admin@medetherial.dev",
+      "email": "admin@medetherial.dev",
+      "emailVerified": true,
+      "firstName": "Asha",
+      "lastName": "Kulkarni",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD:Demo@12345}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "offline_access",
+        "uma_authorization",
+        "admin"
+      ]
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000002",
+      "username": "dispatch@medetherial.dev",
+      "email": "dispatch@medetherial.dev",
+      "emailVerified": true,
+      "firstName": "Nikhil",
+      "lastName": "Joshi",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD:Demo@12345}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "offline_access",
+        "uma_authorization",
+        "dispatcher"
+      ]
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000003",
+      "username": "dr.rao@medetherial.dev",
+      "email": "dr.rao@medetherial.dev",
+      "emailVerified": true,
+      "firstName": "Ananya",
+      "lastName": "Rao",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD:Demo@12345}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "offline_access",
+        "uma_authorization",
+        "doctor"
+      ]
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000004",
+      "username": "dr.menon@medetherial.dev",
+      "email": "dr.menon@medetherial.dev",
+      "emailVerified": true,
+      "firstName": "Vikram",
+      "lastName": "Menon",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD:Demo@12345}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "offline_access",
+        "uma_authorization",
+        "doctor"
+      ]
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000005",
+      "username": "dr.iyer@medetherial.dev",
+      "email": "dr.iyer@medetherial.dev",
+      "emailVerified": true,
+      "firstName": "Kavya",
+      "lastName": "Iyer",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD:Demo@12345}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "offline_access",
+        "uma_authorization",
+        "doctor"
+      ]
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000006",
+      "username": "dr.shetty@medetherial.dev",
+      "email": "dr.shetty@medetherial.dev",
+      "emailVerified": true,
+      "firstName": "Arjun",
+      "lastName": "Shetty",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD:Demo@12345}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "offline_access",
+        "uma_authorization",
+        "doctor"
+      ]
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000007",
+      "username": "paramedic@medetherial.dev",
+      "email": "paramedic@medetherial.dev",
+      "emailVerified": true,
+      "firstName": "Ravi",
+      "lastName": "Kumar",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD:Demo@12345}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "offline_access",
+        "uma_authorization",
+        "paramedic"
+      ]
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000008",
+      "username": "hospital@medetherial.dev",
+      "email": "hospital@medetherial.dev",
+      "emailVerified": true,
+      "firstName": "Meera",
+      "lastName": "Nair",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD:Demo@12345}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "offline_access",
+        "uma_authorization",
+        "hospital_admin"
+      ]
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000009",
+      "username": "patient@medetherial.dev",
+      "email": "patient@medetherial.dev",
+      "emailVerified": true,
+      "firstName": "Priya",
+      "lastName": "Sharma",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD:Demo@12345}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-medetherial",
+        "patient"
+      ]
+    },
+    {
+      "id": "a0000000-0000-4000-8000-00000000000a",
+      "username": "rahul@medetherial.dev",
+      "email": "rahul@medetherial.dev",
+      "emailVerified": true,
+      "firstName": "Rahul",
+      "lastName": "Verma",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD:Demo@12345}",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "default-roles-medetherial",
+        "patient"
+      ]
+    },
+    {
+      "username": "service-account-medetherial-api-admin",
+      "enabled": true,
+      "serviceAccountClientId": "medetherial-api-admin",
+      "clientRoles": {
+        "realm-management": [
+          "view-users",
+          "query-users",
+          "manage-users",
+          "view-realm"
+        ]
+      }
+    }
+  ]
+}
