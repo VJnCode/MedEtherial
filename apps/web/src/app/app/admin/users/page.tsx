@@ -1,19 +1,22 @@
 'use client';
 
-import { ROLES, ROLE_LABELS, type Role } from '@medetherial/shared';
+import { ROLES, ROLE_LABELS, canGrantRole, type Role } from '@medetherial/shared';
 import { formatDistanceToNow } from 'date-fns';
 import { Search, ShieldCheck, UserCog } from 'lucide-react';
 import { useDeferredValue, useState } from 'react';
+import { ROLES_BY_RANK, RoleRequestsPanel } from '@/components/app/roles';
 import { EmptyState, ErrorNote, ListSkeleton, PageHeader } from '@/components/common';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/overlay';
 import { Avatar, AvatarFallback, Badge, Checkbox, Input, Label, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/primitives';
 import { useApiMutation, useApiQuery, type Page } from '@/lib/api';
+import { useRoles } from '@/lib/hooks';
 import type { AdminUser } from '@/lib/types';
 import { initials } from '@/lib/utils';
 
 function RolesDialog({ user, onClose }: { user: AdminUser; onClose: () => void }) {
+  const { roles: mine } = useRoles();
   const [roles, setRoles] = useState<Role[]>(user.roles);
   const save = useApiMutation<void>(() => ({ path: `/admin/users/${user.id}/roles`, method: 'PUT', body: { roles } }), {
     invalidate: [['admin-users']],
@@ -24,15 +27,20 @@ function RolesDialog({ user, onClose }: { user: AdminUser; onClose: () => void }
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Roles for {user.name}</DialogTitle>
-        <DialogDescription>Changes are written to the identity provider (Keycloak) and audit-logged.</DialogDescription>
+        <DialogDescription>
+          Changes are written to the identity provider (Keycloak) and audit-logged. Roles are listed from most to least authority; you can only grant roles ranked below your own.
+        </DialogDescription>
       </DialogHeader>
       <div className="space-y-3">
-        {ROLES.map((r) => (
-          <Label key={r} className="hover:bg-muted/50 flex cursor-pointer items-center gap-3 rounded-lg border p-3 font-normal">
-            <Checkbox checked={roles.includes(r)} onCheckedChange={(c) => setRoles(c ? [...roles, r] : roles.filter((x) => x !== r))} />
-            <span className="font-medium">{ROLE_LABELS[r]}</span>
-          </Label>
-        ))}
+        {ROLES_BY_RANK.map((r) => {
+          const locked = !canGrantRole(mine, r);
+          return (
+            <Label key={r} className={`flex items-center gap-3 rounded-lg border p-3 font-normal ${locked ? 'opacity-50' : 'hover:bg-muted/50 cursor-pointer'}`}>
+              <Checkbox disabled={locked} checked={roles.includes(r)} onCheckedChange={(c) => setRoles(c ? [...roles, r] : roles.filter((x) => x !== r))} />
+              <span className="font-medium">{ROLE_LABELS[r]}</span>
+            </Label>
+          );
+        })}
       </div>
       <DialogFooter>
         <Button disabled={!roles.length || save.isPending} onClick={() => save.mutate()}>
@@ -57,6 +65,7 @@ export default function UsersPage() {
   return (
     <div className="space-y-6">
       <PageHeader title="Users & roles" description="Users are provisioned automatically on first sign-in. Manage their access here." />
+      <RoleRequestsPanel />
       <div className="flex flex-col gap-3 sm:flex-row">
         <div className="relative max-w-md flex-1">
           <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />

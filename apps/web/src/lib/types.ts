@@ -6,6 +6,7 @@ import type {
   LatLng,
   Medication,
   Role,
+  RoleRequestStatus,
   Severity,
   Vitals,
 } from '@medetherial/shared';
@@ -130,6 +131,8 @@ export interface Incident {
 export interface Me {
   user: UserRef & { hospital?: { id: string; name: string } };
   roles: Role[];
+  /** Roles changed after the current access token was issued. */
+  rolesStale: boolean;
   permissions: string[];
   patient: Patient | null;
   doctor: Doctor | null;
@@ -166,4 +169,16 @@ export interface AdminUser {
   roles: Role[];
   lastSeenAt?: string;
   hospital?: { id: string; name: string };
+}
+
+export interface RoleRequest {
+  id: string;
+  role: Role;
+  reason?: string;
+  status: RoleRequestStatus;
+  note?: string;
+  createdAt: string;
+  decidedAt?: string;
+  decidedBy?: { id: string; name: string };
+  user: string | { id: string; name: string; email?: string; roles: Role[] };
 }

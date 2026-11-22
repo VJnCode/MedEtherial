@@ -19,6 +19,7 @@ import { hospitalsRouter } from './routes/hospitals.routes.js';
 import { incidentsRouter } from './routes/incidents.routes.js';
 import { meRouter } from './routes/me.routes.js';
 import { patientsRouter } from './routes/patients.routes.js';
+import { roleRequestsRouter } from './routes/role-requests.routes.js';
 
 export function corsOrigin(origin: string | undefined, cb: (err: Error | null, allow?: boolean) => void) {
   // Non-browser clients (curl, server-to-server) send no Origin header.
@@ -100,6 +101,7 @@ export function createApp(): Express {
   app.use('/api/v1/incidents', incidentsRouter);
   app.use('/api/v1', patientsRouter);
   app.use('/api/v1', fleetRouter);
+  app.use('/api/v1', roleRequestsRouter);
   app.use('/api/v1', adminRouter);
 
   const spec = buildOpenApi('/');

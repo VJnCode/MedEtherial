@@ -53,10 +53,14 @@ export function makeUser(roles: Role[], name = 'Test User'): TestUser {
   return { sub: randomUUID(), name, roles };
 }
 
-export async function tokenFor(u: TestUser, opts: { audience?: string; expiresIn?: string } = {}) {
+export async function tokenFor(
+  u: TestUser,
+  opts: { audience?: string; expiresIn?: string; claims?: Record<string, unknown> } = {},
+) {
   return new SignJWT({
     name: u.name,
     email: `${u.sub.slice(0, 8)}@test.local`,
+    ...opts.claims,
     realm_access: { roles: [...u.roles, 'offline_access'] },
   })
     .setProtectedHeader({ alg: 'RS256', kid: 'test' })

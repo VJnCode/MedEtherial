@@ -9,6 +9,11 @@ const userSchema = new Schema(
     email: { type: String, lowercase: true, trim: true },
     name: { type: String, required: true, trim: true },
     roles: [{ type: String, enum: ROLES }],
+    /**
+     * Set whenever roles are changed server-side (approval, admin edit). Tokens issued before
+     * this instant carry outdated roles, so the API uses `roles` from here instead.
+     */
+    rolesChangedAt: Date,
     phone: String,
     avatarUrl: String,
     /** Affiliation for hospital admins / paramedics. Doctors carry it on their Doctor profile. */

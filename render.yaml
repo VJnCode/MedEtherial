@@ -67,6 +67,8 @@ services:
         sync: false # same value as KC_ADMIN_CLIENT_SECRET on the Keycloak service
       - key: CORS_ORIGINS
         sync: false # https://medetherial.vercel.app
+      - key: BOOTSTRAP_ADMIN_EMAILS
+        value: vjcodes247@gmail.com # always admin once signed in with a verified e-mail (Google)
       - key: OSRM_URL
         value: https://router.project-osrm.org
       - key: CLINIC_TIMEZONE

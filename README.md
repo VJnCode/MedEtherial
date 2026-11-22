@@ -73,6 +73,35 @@ The local password is `Demo@12345`. In production it comes from `DEMO_USER_PASSW
 
 The Keycloak admin console is at http://localhost:8080 (admin / admin, local only).
 
+### Sign in with Google
+
+Google is brokered through Keycloak, so the API still only trusts Keycloak tokens.
+
+1. In Google Cloud Console → **APIs & Services → Credentials**, create an OAuth client (type *Web application*) and add the redirect URI
+   `http://localhost:8080/realms/medetherial/broker/google/endpoint` (in production, use your Keycloak host instead).
+2. Put `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` in `apps/api/.env` and run:
+
+   ```bash
+   pnpm --filter @medetherial/api keycloak:google   # idempotent; also works against Render with KC_ADMIN_* set
+   ```
+
+The sign-in page shows **Continue with Google** unless `NEXT_PUBLIC_GOOGLE_SIGNIN=false`.
+
+### Roles, approval and hierarchy
+
+| Rank | Role | How you get it |
+| --- | --- | --- |
+| 100 | Administrator | Granted by an admin, or automatically for `BOOTSTRAP_ADMIN_EMAILS` once the e-mail is verified (Google) |
+| 60 | Hospital admin | Request from **Profile → Roles & access**, approved by an admin |
+| 50 | Dispatcher | Same |
+| 40 | Doctor | Same |
+| 30 | Paramedic | Same |
+| 10 | Patient | Instant. Every new account (password or Google) starts as a patient |
+
+- Approving a role needs the `role:approve` permission (admins only by default) and a rank above that role. You can only edit users who rank below you; admins can manage admins.
+- Users can give up any of their roles from their profile, but must keep at least one. Admins cannot remove their own admin role, and bootstrap admins always keep it.
+- Every request, approval and role change is written to the audit log. Changes take effect on the user's **next request**: the API uses the updated roles for tokens issued before the change and tells the web app to refresh its token.
+
 ### Quality gates
 
 ```bash

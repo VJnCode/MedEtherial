@@ -1,14 +1,13 @@
-import { ROLES, pagination, updateUserRoles } from '@medetherial/shared';
+import { ROLES, ROLE_LABELS, canGrantRole, canManageUser, pagination, updateUserRoles } from '@medetherial/shared';
 import { Router } from 'express';
 import { z } from 'zod';
 import { authOf } from '../auth/middleware.js';
-import { clearAuthCache } from '../auth/context.js';
-import { notFound } from '../lib/errors.js';
+import { forbidden, notFound } from '../lib/errors.js';
 import { paginate } from '../lib/paginate.js';
 import { defineRoute, idParams } from '../lib/route.js';
-import { Ambulance, Appointment, AuditLog, Doctor, Hospital, Incident, User } from '../models/index.js';
+import { Ambulance, Appointment, AuditLog, Hospital, Incident, User } from '../models/index.js';
 import { audit } from '../services/audit.service.js';
-import { setUserRealmRoles } from '../services/keycloak-admin.service.js';
+import { applyUserRoles, currentRolesOf, isBootstrapAdminEmail } from '../services/roles.service.js';
 
 export const adminRouter = Router();
 const base = '/api/v1';
@@ -45,7 +44,7 @@ defineRoute(
     path: '/admin/users/:id/roles',
     summary: 'Replace a user’s roles (writes through to Keycloak)',
     tag: 'Admin',
-    permissions: ['user:manage'],
+    permissions: ['role:approve'],
     params: idParams,
     body: updateUserRoles,
   },
@@ -53,13 +52,18 @@ defineRoute(
     const auth = authOf(req);
     const user = await User.findById(params.id);
     if (!user) throw notFound('User not found');
-    const roles = await setUserRealmRoles(user.sub, body.roles);
-    user.roles = roles;
-    await user.save();
-    if (roles.includes('doctor')) {
-      await Doctor.updateOne({ user: user._id }, { $setOnInsert: { user: user._id, specialty: 'General Medicine' } }, { upsert: true });
+    const isSelf = user._id.equals(auth.userId);
+    const current = await currentRolesOf(user);
+    if (!isSelf && !canManageUser(auth.roles, current)) throw forbidden('You cannot manage a user who outranks you');
+    // Every role being added or removed must sit below the actor in the hierarchy.
+    const changed = [...body.roles.filter((r) => !current.includes(r)), ...current.filter((r) => !body.roles.includes(r))];
+    const denied = changed.find((r) => !canGrantRole(auth.roles, r));
+    if (denied) throw forbidden(`Your role cannot grant or revoke ${ROLE_LABELS[denied]}`);
+    if (current.includes('admin') && !body.roles.includes('admin')) {
+      if (isSelf) throw forbidden('You cannot remove your own Administrator role');
+      if (isBootstrapAdminEmail(user.email)) throw forbidden('This account is a configured platform owner and must keep the Administrator role');
     }
-    clearAuthCache();
+    const roles = await applyUserRoles(user, body.roles);
     audit(auth, { action: 'user.roles.update', resourceType: 'User', resourceId: params.id, meta: { roles } }, req);
     return user;
   },

@@ -90,7 +90,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: { signIn: '/login', error: '/login' },
   trustHost: true,
   callbacks: {
-    async jwt({ token, account }) {
+    async jwt({ token, account, trigger }) {
       if (account) {
         return {
           ...token,
@@ -101,6 +101,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           roles: rolesFromAccessToken(account.access_token),
         };
       }
+      // The client asks for a fresh token after its roles change (see RoleSync).
+      if (trigger === 'update') return refreshAccessToken(token);
       // Refresh 30s before expiry.
       if (token.expiresAt && Date.now() < token.expiresAt * 1000 - 30_000) return token;
       return refreshAccessToken(token);

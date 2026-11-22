@@ -160,4 +160,13 @@ export const updateUserRoles = z.object({
   roles: z.array(z.enum(ROLES)).min(1),
 });
 
+export const roleRequestCreate = z.object({
+  role: z.enum(ROLES),
+  reason: z.string().trim().max(500).optional(),
+});
+
+export const roleRequestDecision = z.object({
+  note: z.string().trim().max(500).optional(),
+});
+
 export const severitySchema = z.enum(SEVERITIES);

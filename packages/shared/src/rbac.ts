@@ -24,6 +24,7 @@ export const PERMISSIONS = [
   'hospital:read',
   'hospital:manage',
   'user:manage',
+  'role:approve',
   'audit:read',
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];
@@ -109,3 +110,46 @@ export const ROLE_LABELS: Record<Role, string> = {
   hospital_admin: 'Hospital Admin',
   admin: 'Administrator',
 };
+
+export const ROLE_DESCRIPTIONS: Record<Role, string> = {
+  patient: 'Book appointments, view your records and raise an SOS.',
+  doctor: 'Manage your schedule, write clinical notes and prescriptions.',
+  paramedic: 'Ambulance crew: publish GPS and update incidents.',
+  dispatcher: 'Monitor the fleet and assign ambulances to incidents.',
+  hospital_admin: 'Manage ER capacity and incoming patients for a hospital.',
+  admin: 'Full platform administration, including user roles.',
+};
+
+/**
+ * Role hierarchy. A higher rank means more authority. Approving or removing a role
+ * requires `role:approve` and a rank strictly above that role (admins may manage admins).
+ */
+export const ROLE_RANK: Record<Role, number> = {
+  patient: 10,
+  paramedic: 30,
+  doctor: 40,
+  dispatcher: 50,
+  hospital_admin: 60,
+  admin: 100,
+};
+
+/** Roles anyone can hold without approval. */
+export const SELF_SERVICE_ROLES: readonly Role[] = ['patient'];
+
+export function highestRank(roles: readonly string[]): number {
+  return Math.max(0, ...roles.filter(isRole).map((r) => ROLE_RANK[r]));
+}
+
+/** Whether a user holding `actorRoles` may grant or revoke `role` for someone else. */
+export function canGrantRole(actorRoles: readonly string[], role: Role): boolean {
+  if (!hasPermission(actorRoles, 'role:approve')) return false;
+  if (actorRoles.includes('admin')) return true;
+  return highestRank(actorRoles) > ROLE_RANK[role];
+}
+
+/** Whether `actorRoles` outranks the target user, so that their roles may be edited. */
+export function canManageUser(actorRoles: readonly string[], targetRoles: readonly string[]): boolean {
+  if (!hasPermission(actorRoles, 'role:approve')) return false;
+  if (actorRoles.includes('admin')) return true;
+  return highestRank(actorRoles) > highestRank(targetRoles);
+}

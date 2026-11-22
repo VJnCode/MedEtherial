@@ -7,3 +7,4 @@ export * from './clinical.model.js';
 export * from './ambulance.model.js';
 export * from './incident.model.js';
 export * from './tracking.model.js';
+export * from './role-request.model.js';

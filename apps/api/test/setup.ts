@@ -5,3 +5,4 @@ process.env.MONGODB_URI ??= 'mongodb://placeholder/test';
 process.env.OIDC_ISSUER = 'https://auth.test.local/realms/medetherial';
 process.env.OIDC_AUDIENCE = 'medetherial-api';
 process.env.SIMULATOR_ENABLED = 'false';
+process.env.BOOTSTRAP_ADMIN_EMAILS = 'owner@test.local';

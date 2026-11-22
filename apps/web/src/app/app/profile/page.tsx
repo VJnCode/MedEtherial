@@ -3,6 +3,7 @@
 import { BLOOD_GROUPS, ROLE_LABELS } from '@medetherial/shared';
 import { ExternalLink, Plus, Save, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { MyRolesCard } from '@/components/app/roles';
 import { PageHeader } from '@/components/common';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -214,6 +215,7 @@ export default function ProfilePage() {
           )}
         </CardContent>
       </Card>
+      <MyRolesCard roles={roles} />
       {patient && <PatientProfileForm patient={patient} />}
       {doctor && <AvailabilityForm doctor={doctor} />}
     </div>

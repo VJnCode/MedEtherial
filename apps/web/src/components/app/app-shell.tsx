@@ -5,7 +5,8 @@ import { LogOut, Menu, UserRound } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
-import { useEffect, type ReactNode } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { Logo, ThemeToggle } from '@/components/brand';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,6 +22,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/overlay';
 import { Avatar, AvatarFallback, Badge, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/primitives';
+import { useMe } from '@/lib/hooks';
 import { navFor, type NavItem } from '@/lib/nav';
 import { SocketProvider, useSocket } from '@/lib/socket';
 import { cn, initials } from '@/lib/utils';
@@ -86,6 +88,29 @@ function ConnectionDot() {
   );
 }
 
+/**
+ * When an administrator approves (or removes) a role, the API flags the current token as stale.
+ * Fetch a fresh token once so the menus and route guards pick up the new roles.
+ */
+function RoleSync() {
+  const { update } = useSession();
+  const me = useMe();
+  const qc = useQueryClient();
+  const syncing = useRef(false);
+  const stale = me.data?.rolesStale === true;
+  useEffect(() => {
+    if (!stale || syncing.current) return;
+    syncing.current = true;
+    void update()
+      .then(() => qc.invalidateQueries())
+      .finally(() => {
+        // Allow another attempt later (e.g. after the next approval), but not in a tight loop.
+        setTimeout(() => (syncing.current = false), 30_000);
+      });
+  }, [stale, update, qc]);
+  return null;
+}
+
 function UserMenu() {
   const { data } = useSession();
   const roles = data?.roles ?? [];
@@ -138,6 +163,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <SocketProvider>
+      <RoleSync />
       <div className="flex min-h-dvh">
         <aside className="bg-sidebar border-sidebar-border sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r lg:flex">
           <div className="flex h-16 items-center px-5">

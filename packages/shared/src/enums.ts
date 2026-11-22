@@ -72,3 +72,6 @@ export function canTransitionAppointment(from: AppointmentStatus, to: Appointmen
 }
 
 export const SLOT_MINUTES = 30;
+
+export const ROLE_REQUEST_STATUSES = ['pending', 'approved', 'rejected', 'cancelled'] as const;
+export type RoleRequestStatus = (typeof ROLE_REQUEST_STATUSES)[number];

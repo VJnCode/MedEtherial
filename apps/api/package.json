@@ -9,6 +9,7 @@
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/server.js",
     "seed": "tsx --env-file-if-exists=.env src/scripts/seed.ts",
+    "keycloak:google": "tsx --env-file-if-exists=.env src/scripts/setup-google-idp.ts",
     "seed:reset": "tsx --env-file-if-exists=.env src/scripts/seed.ts --reset",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint src",

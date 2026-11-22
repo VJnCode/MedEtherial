@@ -21,6 +21,7 @@ defineRoute(meRouter, base, { method: 'get', path: '/', summary: 'Current user p
   return {
     user,
     roles: auth.roles,
+    rolesStale: auth.rolesStale,
     permissions: [...auth.permissions],
     patient,
     doctor,

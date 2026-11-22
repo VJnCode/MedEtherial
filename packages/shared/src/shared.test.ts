@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { canTransition, hasPermission, haversine, primaryRole, triage } from './index.js';
+import { canGrantRole, canManageUser, canTransition, hasPermission, haversine, primaryRole, triage } from './index.js';
 
 describe('rbac', () => {
   it('grants admin everything', () => expect(hasPermission(['admin'], 'user:manage')).toBe(true));
@@ -27,5 +27,19 @@ describe('geo', () => {
     const d = haversine({ lat: 12.3052, lng: 76.6552 }, { lat: 12.3162, lng: 76.6448 });
     expect(d).toBeGreaterThan(1500);
     expect(d).toBeLessThan(2500);
+  });
+});
+
+describe('role hierarchy', () => {
+  it('lets admins grant every role, including admin', () => {
+    for (const r of ['patient', 'doctor', 'dispatcher', 'admin'] as const) expect(canGrantRole(['admin'], r)).toBe(true);
+  });
+  it('gives nobody else approval rights by default', () => {
+    expect(canGrantRole(['hospital_admin'], 'doctor')).toBe(false);
+    expect(canGrantRole(['doctor', 'patient'], 'patient')).toBe(false);
+  });
+  it('only manages users who rank lower', () => {
+    expect(canManageUser(['admin'], ['admin'])).toBe(true);
+    expect(canManageUser(['dispatcher'], ['patient'])).toBe(false);
   });
 });

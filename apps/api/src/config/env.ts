@@ -37,6 +37,16 @@ const schema = z.object({
   SIMULATOR_ENABLED: bool,
   SIMULATOR_TICK_MS: z.coerce.number().int().min(500).default(2000),
   SIMULATOR_AUTO_INCIDENTS: bool,
+  /** Comma separated e-mails that are always granted `admin` once their e-mail is verified (e.g. via Google). */
+  BOOTSTRAP_ADMIN_EMAILS: z
+    .string()
+    .default('')
+    .transform((s) =>
+      s
+        .split(',')
+        .map((x) => x.trim().toLowerCase())
+        .filter(Boolean),
+    ),
 });
 
 export type Env = z.infer<typeof schema>;
