@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 # Build context: repository root  →  docker build -f apps/api/Dockerfile .
-FROM node:22-alpine AS base
+FROM node:26-alpine AS base
 ENV PNPM_HOME=/pnpm PATH=/pnpm:$PATH MONGOMS_DISABLE_POSTINSTALL=1 CI=true
 RUN corepack enable
 WORKDIR /repo
@@ -17,7 +17,7 @@ RUN pnpm --filter @medetherial/shared build && pnpm --filter @medetherial/api bu
 FROM base AS prod-deps
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod --filter "@medetherial/api..."
 
-FROM node:22-alpine AS runtime
+FROM node:26-alpine AS runtime
 ENV NODE_ENV=production PORT=8000
 WORKDIR /repo
 RUN apk add --no-cache tini
