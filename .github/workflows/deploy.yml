@@ -1,0 +1,76 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  backend:
+    name: API & Keycloak → Render
+    needs: ci
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 20
+    steps:
+      - name: Trigger Keycloak deploy
+        env:
+          KC_HOOK: ${{ secrets.RENDER_KEYCLOAK_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$KC_HOOK" ]; then echo "RENDER_KEYCLOAK_DEPLOY_HOOK not set — skipping Keycloak deploy"; exit 0; fi
+          curl -fsS -X POST "$KC_HOOK" > /dev/null
+
+      - name: Trigger API deploy
+        env:
+          API_HOOK: ${{ secrets.RENDER_API_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$API_HOOK" ]; then echo "::error::RENDER_API_DEPLOY_HOOK secret is not set"; exit 1; fi
+          curl -fsS -X POST "$API_HOOK" > /dev/null
+
+      - name: Wait for API health
+        env:
+          API_URL: ${{ vars.API_URL }}
+        run: |
+          if [ -z "$API_URL" ]; then echo "API_URL variable not set — skipping health check"; exit 0; fi
+          # Give Render time to pick up the new build before polling.
+          sleep 60
+          for i in $(seq 1 40); do
+            if curl -fsS "$API_URL/readyz" > /dev/null; then echo "API is ready"; exit 0; fi
+            echo "Waiting for API ($i/40)…"; sleep 15
+          done
+          echo "::error::API did not become ready in time"; exit 1
+
+  frontend:
+    name: Web → Vercel
+    needs: ci
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 20
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: corepack enable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

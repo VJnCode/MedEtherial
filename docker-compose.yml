@@ -1,0 +1,78 @@
+# Local development stack.
+#   docker compose up -d                       → Keycloak + Postgres (use Atlas for MongoDB)
+#   docker compose --profile local-db up -d    → also a local MongoDB
+#   docker compose --profile full up -d        → also the API container
+name: medetherial
+
+services:
+  keycloak-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    volumes:
+      - keycloak-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U keycloak']
+      interval: 5s
+      retries: 10
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.7
+    command: ['start-dev', '--import-realm']
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HOSTNAME: http://localhost:8080
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: 'true'
+      KC_HEALTH_ENABLED: 'true'
+      WEB_URL: http://localhost:3000
+      KC_WEB_CLIENT_SECRET: dev-web-client-secret
+      KC_ADMIN_CLIENT_SECRET: dev-admin-client-secret
+      DEMO_USER_PASSWORD: Demo@12345
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./infra/keycloak/realm-export.json:/opt/keycloak/data/import/medetherial-realm.json:ro
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+
+  mongo:
+    profiles: ['local-db', 'full']
+    image: mongo:7
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo:/data/db
+
+  api:
+    profiles: ['full']
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 8000
+      MONGODB_URI: ${MONGODB_URI:-mongodb://mongo:27017/medetherial}
+      OIDC_ISSUER: http://localhost:8080/realms/medetherial
+      OIDC_JWKS_URI: http://keycloak:8080/realms/medetherial/protocol/openid-connect/certs
+      KEYCLOAK_INTERNAL_URL: http://keycloak:8080
+      OIDC_AUDIENCE: medetherial-api
+      KEYCLOAK_ADMIN_CLIENT_SECRET: dev-admin-client-secret
+      CORS_ORIGINS: http://localhost:3000
+      SIMULATOR_ENABLED: 'true'
+    ports:
+      - '8000:8000'
+    depends_on:
+      - keycloak
+      - mongo
+
+volumes:
+  keycloak-db:
+  mongo:
