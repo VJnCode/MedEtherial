@@ -13,7 +13,7 @@ export default auth((req) => {
 
   if (pathname.startsWith('/app')) {
     if (!session || session.error === 'RefreshTokenError') {
-      const url = new URL('/login', req.nextUrl.origin);
+      const url = new URL('/signin', req.nextUrl.origin);
       url.searchParams.set('callbackUrl', pathname + search);
       return NextResponse.redirect(url);
     }
@@ -25,12 +25,12 @@ export default auth((req) => {
     }
   }
 
-  if (pathname === '/login' && session && !session.error) {
+  if (['/signin', '/signup', '/login'].includes(pathname) && session && !session.error) {
     return NextResponse.redirect(new URL('/app', req.nextUrl.origin));
   }
   return NextResponse.next();
 });
 
 export const config = {
-  matcher: ['/app/:path*', '/login'],
+  matcher: ['/app/:path*', '/signin', '/signup', '/login'],
 };

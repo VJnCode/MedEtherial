@@ -15,7 +15,7 @@ test('theme toggle switches to dark mode', async ({ page }) => {
 
 test('protected app redirects anonymous users to sign-in', async ({ page }) => {
   await page.goto('/app/dispatch');
-  await expect(page).toHaveURL(/\/login\?callbackUrl=%2Fapp%2Fdispatch/);
+  await expect(page).toHaveURL(/\/signin\?callbackUrl=%2Fapp%2Fdispatch/);
   await expect(page.getByTestId('sign-in')).toBeVisible();
 });
 

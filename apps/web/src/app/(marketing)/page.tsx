@@ -80,12 +80,12 @@ export default function LandingPage() {
             </FadeIn>
             <FadeIn delay={0.15} className="flex flex-wrap gap-3">
               <Button asChild size="lg">
-                <Link href="/login?mode=register">
+                <Link href="/signup">
                   Create your account <ArrowRight />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link href="/login">Sign in</Link>
+                <Link href="/signin">Sign in</Link>
               </Button>
             </FadeIn>
             <FadeIn delay={0.2} className="text-muted-foreground flex flex-wrap gap-x-6 gap-y-2 pt-2 text-sm">
@@ -221,7 +221,7 @@ export default function LandingPage() {
             <p className="text-white/80">Create a patient account in seconds, or sign in with the account your organisation gave you.</p>
             <div className="flex flex-wrap justify-center gap-3">
               <Button asChild size="lg" variant="secondary">
-                <Link href="/login?mode=register">
+                <Link href="/signup">
                   Get started <ArrowRight />
                 </Link>
               </Button>

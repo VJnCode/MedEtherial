@@ -29,10 +29,10 @@ export function SiteHeader() {
     ) : (
       <>
         <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-          <Link href="/login">Sign in</Link>
+          <Link href="/signin">Sign in</Link>
         </Button>
         <Button asChild size="sm">
-          <Link href="/login?mode=register">Get started</Link>
+          <Link href="/signup">Get started</Link>
         </Button>
       </>
     );

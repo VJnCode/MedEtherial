@@ -7,6 +7,6 @@ export const metadata: Metadata = { title: 'Dashboard', robots: { index: false }
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
-  if (!session || session.error) redirect('/login?callbackUrl=/app');
+  if (!session || session.error) redirect('/signin?callbackUrl=/app');
   return <AppShell>{children}</AppShell>;
 }
