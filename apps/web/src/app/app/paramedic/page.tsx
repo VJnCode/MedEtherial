@@ -4,13 +4,14 @@ import { Ambulance, Radio, Satellite, ShieldCheck } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { IncidentTracker } from '@/components/app/incident-tracker';
+import { ManualDrive } from '@/components/app/manual-drive';
 import { AmbulanceStatusBadge, EmptyState, PageHeader } from '@/components/common';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge, Label, Skeleton, Switch } from '@/components/ui/primitives';
 import { useApiQuery, useInvalidate, type Page } from '@/lib/api';
 import { useMe } from '@/lib/hooks';
 import { useSocket, useSocketEvent } from '@/lib/socket';
-import type { Incident } from '@/lib/types';
+import type { Ambulance as Unit, Incident } from '@/lib/types';
 
 const SEND_EVERY_MS = 3000;
 
@@ -61,7 +62,11 @@ export default function ParamedicPage() {
   const invalidate = useInvalidate();
   const ambulance = me.data?.ambulance;
   const [sharing, setSharing] = useState(false);
-  const fix = useGpsBroadcast(ambulance?.id, sharing);
+  const [driving, setDriving] = useState(false);
+  // Real GPS and the manual test driver would fight over the position, so only one runs.
+  const fix = useGpsBroadcast(ambulance?.id, sharing && !driving);
+  const fleet = useApiQuery<Unit[]>(['ambulances'], '/ambulances', { enabled: Boolean(ambulance) });
+  const ownUnit = (fleet.data ?? []).filter((u) => u.id === ambulance?.id);
   const active = useApiQuery<Page<Incident>>(['incidents', 'active'], '/incidents?active=true&limit=1', { enabled: Boolean(ambulance) });
   const incident = active.data?.items[0];
 
@@ -110,10 +115,12 @@ export default function ParamedicPage() {
                 <Radio className="size-3 animate-pulse" /> Live
               </Badge>
             )}
-            <Switch id="share" checked={sharing} onCheckedChange={setSharing} data-testid="share-location" />
+            <Switch id="share" checked={sharing && !driving} disabled={driving} onCheckedChange={setSharing} data-testid="share-location" />
           </div>
         </CardContent>
       </Card>
+
+      {ownUnit.length > 0 && <ManualDrive units={ownUnit} fixedUnitId={ambulance.id} onActiveChange={setDriving} />}
 
       {active.isLoading ? (
         <Skeleton className="h-96" />

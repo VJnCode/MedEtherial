@@ -9,14 +9,20 @@ export type AuthSearchParams = Promise<Record<string, string | undefined>>;
 
 const GOOGLE_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_SIGNIN !== 'false';
 
-const DEMO = [
-  ['patient@medetherial.dev', 'Patient'],
-  ['dr.rao@medetherial.dev', 'Doctor'],
-  ['paramedic@medetherial.dev', 'Paramedic'],
-  ['dispatch@medetherial.dev', 'Dispatcher'],
-  ['hospital@medetherial.dev', 'Hospital admin'],
-  ['admin@medetherial.dev', 'Administrator'],
+const SHOW_DEMO = process.env.NEXT_PUBLIC_SHOW_DEMO_ACCOUNTS === 'true';
+const DEMO_PASSWORD = process.env.NEXT_PUBLIC_DEMO_PASSWORD;
+
+const DEMO: { email: string; role: string; note: string; admin?: boolean }[] = [
+  { email: 'patient@medetherial.dev', role: 'Patient', note: 'Book doctors, health records, SOS' },
+  { email: 'dr.rao@medetherial.dev', role: 'Doctor', note: 'Cardiology: schedule, notes, prescriptions' },
+  { email: 'paramedic@medetherial.dev', role: 'Paramedic', note: 'Crew of MYS-ALS-01: live GPS, incident status' },
+  { email: 'dispatch@medetherial.dev', role: 'Dispatcher', note: 'Live fleet map, assign ambulances' },
+  { email: 'hospital@medetherial.dev', role: 'Hospital admin', note: 'ER beds, incoming patients' },
+  { email: 'admin@medetherial.dev', role: 'Administrator', note: 'Users, role approvals, audit log', admin: true },
 ];
+// The demo admin can change anyone's roles, so it is only listed on non-production builds
+// unless explicitly enabled.
+const demoAccounts = DEMO.filter((d) => !d.admin || process.env.NODE_ENV !== 'production' || process.env.NEXT_PUBLIC_DEMO_SHOW_ADMIN === 'true');
 
 const ERRORS: Record<string, string> = {
   OAuthCallbackError: 'The sign-in was cancelled or could not be completed.',
@@ -73,6 +79,12 @@ export async function AuthScreen({ mode, searchParams }: { mode: AuthMode; searc
     // Google is brokered by Keycloak: `kc_idp_hint` skips Keycloak's form and goes straight to Google.
     // First-time Google users are created as patients.
     await signIn('keycloak', { redirectTo: callbackUrl }, { kc_idp_hint: 'google' });
+  }
+  async function demo(form: FormData) {
+    'use server';
+    // `login_hint` pre-fills the e-mail on the Keycloak form; only the password is left to type.
+    const hint = String(form.get('email') ?? '');
+    await signIn('keycloak', { redirectTo: callbackUrl }, DEMO.some((d) => d.email === hint) ? { login_hint: hint } : undefined);
   }
   async function email() {
     'use server';
@@ -145,18 +157,36 @@ export async function AuthScreen({ mode, searchParams }: { mode: AuthMode; searc
             </ul>
           )}
 
-          {mode === 'signin' && process.env.NEXT_PUBLIC_SHOW_DEMO_ACCOUNTS === 'true' && (
-            <div className="bg-muted/40 space-y-3 rounded-xl border p-4">
-              <p className="text-xs font-semibold tracking-wide uppercase">Demo accounts</p>
-              <ul className="space-y-1.5 text-xs">
-                {DEMO.map(([address, role]) => (
-                  <li key={address} className="flex items-center justify-between gap-2">
-                    <code className="font-mono">{address}</code>
-                    <span className="text-muted-foreground">{role}</span>
+          {mode === 'signin' && SHOW_DEMO && (
+            <div className="bg-muted/40 space-y-3 rounded-xl border p-4" data-testid="demo-accounts">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <p className="text-xs font-semibold tracking-wide uppercase">Test accounts</p>
+                {DEMO_PASSWORD ? (
+                  <p className="text-xs">
+                    Password for all: <code className="bg-background rounded border px-1.5 py-0.5 font-mono font-semibold select-all">{DEMO_PASSWORD}</code>
+                  </p>
+                ) : (
+                  <p className="text-muted-foreground text-xs">Ask your administrator for the demo password.</p>
+                )}
+              </div>
+              <ul className="divide-y rounded-lg border">
+                {demoAccounts.map((d) => (
+                  <li key={d.email} className="bg-background flex items-center justify-between gap-3 px-3 py-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium">{d.role}</p>
+                      <code className="text-muted-foreground block truncate font-mono text-xs select-all">{d.email}</code>
+                      <p className="text-muted-foreground truncate text-[11px]">{d.note}</p>
+                    </div>
+                    <form action={demo}>
+                      <input type="hidden" name="email" value={d.email} />
+                      <Button type="submit" size="sm" variant="outline" aria-label={`Sign in as ${d.role}`}>
+                        Use
+                      </Button>
+                    </form>
                   </li>
                 ))}
               </ul>
-              <p className="text-muted-foreground text-xs">Use the demo password your administrator configured.</p>
+              <p className="text-muted-foreground text-[11px]">“Use” opens the sign-in form with the e-mail filled in. Just enter the password.</p>
             </div>
           )}
 

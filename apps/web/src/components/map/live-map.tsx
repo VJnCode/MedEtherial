@@ -35,6 +35,8 @@ export interface LiveMapProps {
   routes?: MapRoute[];
   fitTo?: LatLng[];
   onMapClick?: (p: LatLng) => void;
+  /** Keep this point centred (e.g. a unit being driven). */
+  follow?: LatLng;
   className?: string;
 }
 
@@ -85,6 +87,14 @@ function iconFor(m: MapMarker) {
   return L.divIcon({ html, className: 'me-marker', iconSize: [30, 40], iconAnchor: [15, 40], popupAnchor: [0, -36] });
 }
 
+function Follow({ point }: { point?: LatLng }) {
+  const map = useMap();
+  useEffect(() => {
+    if (point) map.panTo([point.lat, point.lng], { animate: false });
+  }, [point?.lat, point?.lng, map]); // eslint-disable-line react-hooks/exhaustive-deps
+  return null;
+}
+
 function FitBounds({ points }: { points?: LatLng[] }) {
   const map = useMap();
   const key = points?.map((p) => `${p.lat.toFixed(3)},${p.lng.toFixed(3)}`).join('|');
@@ -115,7 +125,7 @@ function ResizeWatcher() {
   return null;
 }
 
-export default function LiveMap({ center, zoom = 13, markers = [], routes = [], fitTo, onMapClick, className }: LiveMapProps) {
+export default function LiveMap({ center, zoom = 13, markers = [], routes = [], fitTo, onMapClick, follow, className }: LiveMapProps) {
   const { resolvedTheme } = useTheme();
   const dark = resolvedTheme === 'dark';
   const icons = useMemo(
@@ -160,6 +170,7 @@ export default function LiveMap({ center, zoom = 13, markers = [], routes = [], 
         </Marker>
       ))}
       <FitBounds points={fitTo} />
+      <Follow point={follow} />
       <ClickHandler onClick={onMapClick} />
       <ResizeWatcher />
     </MapContainer>
