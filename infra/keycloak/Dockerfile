@@ -1,6 +1,6 @@
 # Production Keycloak image with the MedEtherial realm baked in.
 # Tuned to fit a 512 MB container (Render free plan).
-FROM quay.io/keycloak/keycloak:26.0.7 AS builder
+FROM quay.io/keycloak/keycloak:26.8.2-3 AS builder
 # KC_CACHE=local: single instance, no cluster cache, so it uses less RAM.
 ENV KC_DB=postgres \
     KC_CACHE=local \
@@ -8,7 +8,7 @@ ENV KC_DB=postgres \
     KC_METRICS_ENABLED=false
 RUN /opt/keycloak/bin/kc.sh build
 
-FROM quay.io/keycloak/keycloak:26.0.7
+FROM quay.io/keycloak/keycloak:26.8.2-3
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 COPY realm-export.json /opt/keycloak/data/import/medetherial-realm.json
 ENV KC_HTTP_ENABLED=true \
