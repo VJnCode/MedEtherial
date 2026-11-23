@@ -158,7 +158,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   // Expired refresh token → back through the login flow.
   useEffect(() => {
-    if (data?.error === 'RefreshTokenError') window.location.href = '/login?callbackUrl=' + encodeURIComponent(window.location.pathname);
+    if (data?.error === 'RefreshTokenError') window.location.href = '/signin?callbackUrl=' + encodeURIComponent(window.location.pathname);
   }, [data?.error]);
 
   return (
