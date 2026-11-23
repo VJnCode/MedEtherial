@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { IncidentList } from '@/components/app/incident-list';
+import { ManualDrive } from '@/components/app/manual-drive';
 import { AmbulanceStatusBadge, PageHeader, SeverityBadge } from '@/components/common';
 import { LiveMap, type MapMarker } from '@/components/map';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/overlay';
 import { Badge, Label } from '@/components/ui/primitives';
 import { useApiMutation, useApiQuery, useInvalidate, type Page } from '@/lib/api';
+import { useRoles } from '@/lib/hooks';
 import { useSocketEvent } from '@/lib/socket';
 import type { Ambulance, Hospital, Incident } from '@/lib/types';
 import { formatEta } from '@/lib/utils';
@@ -88,6 +90,8 @@ export default function DispatchPage() {
   const hospitals = useApiQuery<Hospital[]>(['hospitals'], '/hospitals');
   const [livePos, setLivePos] = useState<Record<string, AmbulanceLocationEvent>>({});
   const [selected, setSelected] = useState<string>();
+  // Only admins may publish positions for any unit (crews drive their own from the crew console).
+  const canDrive = useRoles().is('admin');
 
   useSocketEvent('ambulance:location', (e) => setLivePos((prev) => ({ ...prev, [e.ambulanceId]: e })));
   useSocketEvent('incident:new', (e) => {
@@ -216,6 +220,7 @@ export default function DispatchPage() {
           </Card>
         </div>
       </div>
+      {canDrive && <ManualDrive units={fleet.data ?? []} />}
     </div>
   );
 }
