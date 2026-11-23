@@ -115,14 +115,15 @@ The API integration tests run against an in-memory MongoDB, with a locally signe
 
 ### 1. Keycloak and API on Render
 
-1. In Render, choose **New → Blueprint** and point it at this repo. `render.yaml` creates `medetherial-keycloak`, its Postgres database and `medetherial-api`.
-2. Fill the `sync: false` variables:
-   - **Keycloak:** `KC_DB_URL` (`jdbc:postgresql://<internal-host>:5432/keycloak`), `KC_HOSTNAME` (its public URL) and `WEB_URL` (your Vercel URL).
+1. Create a free Postgres database on [Neon](https://neon.tech) for Keycloak.
+2. In Render, choose **New → Blueprint** and point it at this repo. `render.yaml` creates `medetherial-keycloak` and `medetherial-api` on the free plan.
+3. Fill the `sync: false` variables:
+   - **Keycloak:** `KC_DB_URL` (`jdbc:postgresql://<neon-host>/neondb?sslmode=require`), `KC_DB_USERNAME`, `KC_DB_PASSWORD`, `KC_HOSTNAME` (its public URL) and `WEB_URL` (your Vercel URL).
    - **API:** `MONGODB_URI`, `OIDC_ISSUER` (`https://<keycloak>/realms/medetherial`), `CORS_ORIGINS` (your Vercel URL) and `KEYCLOAK_ADMIN_CLIENT_SECRET` (same value as the Keycloak service's `KC_ADMIN_CLIENT_SECRET`).
-3. In MongoDB Atlas → Network Access, allow Render's outbound IPs.
-4. Seed once from the Render shell: `node dist/scripts/seed.js`.
+4. In MongoDB Atlas → Network Access, allow Render's outbound IPs.
+5. Seed once from the Render shell: `node dist/scripts/seed.js`.
 
-> Keycloak needs about 512 MB+ of RAM, so use at least the Starter plan. Render's free Postgres expires after 30 days. For long-lived setups, use a paid instance or an external Postgres (e.g. Neon) via `KC_DB_URL`.
+> Both services run on Render's free plan. The Keycloak image is tuned to fit in 512 MB. Free instances sleep after about 15 minutes idle, so the first request after that takes 1–2 minutes. For always-on hosting, switch both to `plan: starter` (about $7/month each).
 
 ### 2. Web on Vercel
 

@@ -1,12 +1,8 @@
 # Render Blueprint — https://render.com/docs/blueprint-spec
-# Deploys: Keycloak (OIDC), its Postgres database, and the MedEtherial API.
+# Deploys Keycloak (OIDC) and the MedEtherial API on Render's free plan.
+# Keycloak's Postgres lives on Neon's free tier (Render's free Postgres is deleted after 30 days).
+# Free instances sleep after ~15 min idle; the first request after that takes ~1-2 min.
 # Secrets marked `sync: false` are entered once in the Render dashboard.
-
-databases:
-  - name: medetherial-keycloak-db
-    databaseName: keycloak
-    user: keycloak
-    plan: free
 
 services:
   - type: web
@@ -14,16 +10,17 @@ services:
     runtime: docker
     rootDir: infra/keycloak
     dockerfilePath: ./Dockerfile
-    plan: starter # Keycloak needs ~512MB+ RAM; free instances are too small
+    plan: free # JVM tuned for 512 MB in infra/keycloak/Dockerfile
+    region: singapore
     healthCheckPath: /realms/medetherial/.well-known/openid-configuration
     autoDeploy: false # deployed by GitHub Actions after CI passes
     envVars:
       - key: KC_DB_URL
-        sync: false # jdbc:postgresql://<host>:5432/keycloak  (from the database's internal URL)
+        sync: false # Neon: jdbc:postgresql://<ep-xxx>.<region>.aws.neon.tech/neondb?sslmode=require
       - key: KC_DB_USERNAME
-        fromDatabase: { name: medetherial-keycloak-db, property: user }
+        sync: false # Neon role, e.g. neondb_owner
       - key: KC_DB_PASSWORD
-        fromDatabase: { name: medetherial-keycloak-db, property: password }
+        sync: false # Neon password
       - key: KC_HOSTNAME
         sync: false # e.g. https://medetherial-keycloak.onrender.com
       - key: KC_BOOTSTRAP_ADMIN_USERNAME
@@ -46,7 +43,7 @@ services:
     runtime: docker
     dockerfilePath: ./apps/api/Dockerfile
     dockerContext: .
-    plan: starter
+    plan: free
     region: singapore
     healthCheckPath: /readyz
     autoDeploy: false
